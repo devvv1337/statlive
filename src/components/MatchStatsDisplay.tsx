@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Info, Clock, BarChart2, Trophy, TrendingUp, X, Star, AlertTriangle, Zap } from 'lucide-react';
+import { Info, Clock, BarChart2, Trophy, TrendingUp, X, Star, AlertTriangle, Zap } from 'lucide-react';
 
 interface MatchStats {
   home: number;
@@ -365,14 +365,16 @@ const MatchStatsDisplay: React.FC = () => {
 
       {/* Highlight Modal */}
       {showHighlightModal && (
-        <div className="fixed top-20 left-4 right-4 bg-surface-light rounded-xl shadow-lg p-4 animate-slide-down">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-betting-win/10 rounded-full flex items-center justify-center">
-              <Zap size={20} className="text-betting-win" />
-            </div>
-            <div>
-              <h4 className="font-medium">Occasion dangereuse !</h4>
-              <p className="text-sm text-gray-500">Tir cadré de l'OM, la possession monte à 62%</p>
+        <div className="fixed left-1/2 transform -translate-x-1/2 top-20 w-full max-w-md px-4">
+          <div className="bg-surface-light rounded-xl shadow-lg p-4 animate-slide-down">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-betting-win/10 rounded-full flex items-center justify-center">
+                <Zap size={20} className="text-betting-win" />
+              </div>
+              <div>
+                <h4 className="font-medium">Occasion dangereuse !</h4>
+                <p className="text-sm text-gray-500">Tir cadré de l'OM, la possession monte à 62%</p>
+              </div>
             </div>
           </div>
         </div>

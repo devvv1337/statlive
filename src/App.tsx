@@ -1,4 +1,3 @@
-import React from 'react';
 import MatchStatsDisplay from './components/MatchStatsDisplay';
 
 function App() {
