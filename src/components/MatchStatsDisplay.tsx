@@ -50,7 +50,7 @@ const MatchStatsDisplay: React.FC = () => {
     awayTeam: "OL",
     score: "3 - 2",
     time: "87'",
-    league: "Ligue McDonald's",
+    league: "Ligue 1 McDonald's",
     redCards: {
       home: 1,
       away: 0,
