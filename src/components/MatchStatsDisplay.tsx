@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Info, Clock, BarChart2, Trophy, TrendingUp, X, Star, AlertTriangle, Zap, ChevronDown, Camera, Link } from 'lucide-react';
+import { Info, Clock, BarChart2, Trophy, X, Star, AlertTriangle, Zap, ChevronDown, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LazyImage from './LazyImage';
 
@@ -40,19 +40,6 @@ interface Reference {
   text: string;
   url: string;
 }
-
-const teamCompositions = {
-  home: {
-    name: "OM",
-    image: "/compo_om.png",
-    algorithm: "Le tracking des joueurs est réalisé en temps réel grâce à notre système de computer vision avancé. Des caméras haute définition suivent chaque joueur sur le terrain, permettant de détecter leur position exacte et leurs mouvements. L'intelligence artificielle analyse ces données pour comprendre les formations, les changements tactiques et les zones d'influence de chaque joueur."
-  },
-  away: {
-    name: "OL",
-    image: "/compo_ol.png",
-    algorithm: "Le tracking des joueurs est réalisé en temps réel grâce à notre système de computer vision avancé. Des caméras haute définition suivent chaque joueur sur le terrain, permettant de détecter leur position exacte et leurs mouvements. L'intelligence artificielle analyse ces données pour comprendre les formations, les changements tactiques et les zones d'influence de chaque joueur."
-  }
-};
 
 const references: Reference[] = [
   {
@@ -97,11 +84,17 @@ const references: Reference[] = [
   }
 ];
 
-const trackingImages = {
-  fieldDetection: "/track1.png",
-  particleFilters: "/track2.png",
-  yoloDetection: "/track3.png",
-  ganVisualization: "/track4.png"
+const teamCompositions = {
+  home: {
+    name: "OM",
+    image: "/compo_om.png",
+    algorithm: "Le tracking des joueurs est réalisé en temps réel grâce à notre système de computer vision avancé. Des caméras haute définition suivent chaque joueur sur le terrain, permettant de détecter leur position exacte et leurs mouvements. L'intelligence artificielle analyse ces données pour comprendre les formations, les changements tactiques et les zones d'influence de chaque joueur."
+  },
+  away: {
+    name: "OL",
+    image: "/compo_ol.png",
+    algorithm: "Le tracking des joueurs est réalisé en temps réel grâce à notre système de computer vision avancé. Des caméras haute définition suivent chaque joueur sur le terrain, permettant de détecter leur position exacte et leurs mouvements. L'intelligence artificielle analyse ces données pour comprendre les formations, les changements tactiques et les zones d'influence de chaque joueur."
+  }
 };
 
 const MatchStatsDisplay: React.FC = () => {
