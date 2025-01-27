@@ -34,7 +34,6 @@ interface MatchData {
     passes: MatchStats;
     xG: MatchStats;
     corners: MatchStats;
-    fouls: MatchStats;
   };
 }
 
@@ -102,13 +101,13 @@ const references: Reference[] = [
   },
   {
     id: 12,
-    text: "Machine Learning et capteurs pour la détection de buts",
-    url: "https://arxiv.org/pdf/2103.02938"
+    text: "Le meilleur tutoriel pour comprendre les Expected Goals",
+    url: "https://ligue1.com/articles/l1_article_497-le-meilleur-tutoriel-pour-comprendre-les-expected-goals"
   },
   {
     id: 13,
-    text: "Classification d'événements avec MLSTM",
-    url: "https://ntnuopen.ntnu.no/ntnu-xmlui/bitstream/handle/11250/3011129/AI-Driven_Salient_Soccer_Events_Recognition_Framework_for_Next_Generation_IoT-Enabled_Environments.pdf"
+    text: "Machine Learning pour la prédiction des Expected Goals",
+    url: "https://pdfs.semanticscholar.org/6812/fb1c2b28641a11ae43014dd59761932b08a5.pdf"
   },
   {
     id: 14,
@@ -183,17 +182,11 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
       odds: { home: 1.90, draw: 3.45, away: 4.10 }
     },
     corners: {
-      home: 9,
-      away: 2,
-      algorithm: "Détection automatique des corners via notre système de tracking vidéo. Les caméras suivent la sortie du ballon et sa position exacte sur le terrain.",
+      home: 65,
+      away: 63,
+      algorithm: "Détection automatique des coups de pied arrêtés via notre système de tracking vidéo. Les caméras suivent la sortie du ballon et sa position exacte sur le terrain.",
       odds: { home: 2.10, draw: 3.20, away: 3.60 },
       trend: 'down'
-    },
-    fouls: {
-      home: 8,
-      away: 15,
-      algorithm: "Analyse en temps réel des contacts entre joueurs via notre système de computer vision. L'IA évalue l'intensité et la nature des contacts pour identifier les fautes.",
-      odds: { home: 2.25, draw: 3.30, away: 3.15 }
     }
   }
 } }) => {
@@ -253,6 +246,14 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
       default:
         return null;
     }
+  };
+
+  const statLabels: { [key: string]: string } = {
+    possession: 'Possession',
+    shots: 'Tirs',
+    passes: 'Passes',
+    xG: 'xG (buts attendus)',
+    corners: 'Coups de pied arrêtés'
   };
 
   return (
@@ -374,15 +375,6 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
           {/* Stats Content */}
           <div className="p-4 space-y-4 overflow-y-auto max-h-[calc(100vh-15rem)]">
             {Object.entries(matchData.stats).map(([key, value]) => {
-              const statLabels: { [key: string]: string } = {
-                possession: 'Possession',
-                shots: 'Tirs',
-                passes: 'Passes',
-                xG: 'xG (buts attendus)',
-                corners: 'Coups de pied arrêtés',
-                fouls: 'Fautes'
-              };
-              
               return (
                 <div key={key} className="bg-surface-light rounded-xl shadow-stats p-4 animate-fade-in">
                   <div className="flex justify-between items-center mb-3">
@@ -549,13 +541,6 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                         <BarChart2 size={24} className="text-betting-win" />
                       </div>
                       Coups de pied arrêtés
-                    </>
-                  ) : selectedStat === 'fouls' ? (
-                    <>
-                      <div className="p-2 bg-white/10 rounded-lg">
-                        <BarChart2 size={24} className="text-betting-win" />
-                      </div>
-                      Fautes
                     </>
                   ) : selectedStat}
                 </h2>
@@ -1956,7 +1941,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                     Comme dans l'exemple ci-dessous, où, au vu du match et des actions que le RC Lens a eues, l'équipe aurait dû marquer 5,24 buts 
                     et Montpellier HSC plutôt 0,82 buts.
                     <button 
-                      onClick={() => setSelectedReference(1)}
+                      onClick={() => setSelectedReference(12)}
                       className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
                     >
                       <sup>[1]</sup>
@@ -1995,7 +1980,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                         Cependant, il est assez logique de penser que l'IA, précisément le Machine Learning, soit une solution pour 
                         ce type de prédiction
                         <button 
-                          onClick={() => setSelectedReference(2)}
+                          onClick={() => setSelectedReference(13)}
                           className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
                         >
                           <sup>[2]</sup>
@@ -2130,7 +2115,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                         <p className="text-gray-600 leading-relaxed">
                           Comme décrit dans la partie but, nous repartons sur cette méthode utilisant des arbres de décision. Dans un premier temps, nous allons détecter un "dead ball interval". Cela indique que le jeu s'est arrêté. Cette zone de non-possession signifie qu'elle ne respecte pas les contraintes de possession décrites dans cette partie du même nom et/ou que la balle n'est plus dans les limites du terrain. Enfin, après ce "dead ball interval", le modèle va rechercher plusieurs patterns pour détecter la raison de cet événement et ainsi le classifier en suivant la méthodologie de la photo ci-dessous :
                           <button 
-                            onClick={() => setSelectedReference(1)}
+                            onClick={() => setSelectedReference(11)}
                             className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
                           >
                             <sup>[1]</sup>
@@ -2213,157 +2198,6 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                             Matrice de corrélation des coups de pied arrêtés
                           </p>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mobile Close Button */}
-              <div className="sm:hidden flex-shrink-0 p-4 bg-white border-t border-gray-100">
-                <button
-                  onClick={() => setSelectedStat(null)}
-                  className="w-full bg-brand-800 hover:bg-brand-700 active:bg-brand-900 text-white px-6 py-3.5 rounded-xl text-sm font-medium flex items-center gap-2 justify-center"
-                >
-                  Fermer
-                </button>
-              </div>
-
-              {/* References Modal */}
-              <AnimatePresence>
-                {selectedReference && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4"
-                    onClick={() => setSelectedReference(null)}
-                  >
-                    <motion.div
-                      className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl"
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-lg font-semibold text-brand-800">Référence [{selectedReference}]</h3>
-                        <button
-                          onClick={() => setSelectedReference(null)}
-                          className="p-1 hover:bg-gray-100 rounded-full"
-                        >
-                          <X size={20} />
-                        </button>
-                      </div>
-                      <p className="text-gray-600 mb-4">{references[selectedReference - 1].text}</p>
-                      <a
-                        href={references[selectedReference - 1].url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-brand-600 hover:text-brand-700 underline break-all"
-                      >
-                        {references[selectedReference - 1].url}
-                      </a>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Fouls Info Modal */}
-      <AnimatePresence>
-        {selectedStat === 'fouls' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center z-50"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 100 }}
-              className="bg-white w-full sm:rounded-2xl sm:max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
-            >
-              {/* Modal Header */}
-              <div className="bg-brand-800 text-white p-4 sm:p-6 flex-shrink-0">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-3">
-                    <div className="p-2 bg-white/10 rounded-lg">
-                      <BarChart2 size={24} className="text-betting-win" />
-                    </div>
-                    Détection des Fautes
-                  </h2>
-                  <button
-                    onClick={() => setSelectedStat(null)}
-                    className="p-2 hover:bg-white/10 active:bg-white/20 rounded-full transition-colors"
-                    aria-label="Fermer"
-                  >
-                    <X size={24} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Modal Content - Scrollable */}
-              <div className="p-4 sm:p-8 overflow-y-auto flex-1">
-                {/* Introduction */}
-                <div className="bg-gray-50 rounded-xl p-4 sm:p-6 shadow-md mb-6">
-                  <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                    Les fautes sont une statistique qui permet de mesurer la probabilité qu'un tir soit un but lors d'une faute. Cette méthode est basée sur l'analyse des données de football et prend en compte de nombreux facteurs pour estimer la probabilité qu'un tir soit un but lors d'une faute.
-                  </p>
-                </div>
-
-                {/* Main Methods Section */}
-                <div className="space-y-6">
-                  {/* Capteurs Section */}
-                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                    <div className="p-4 sm:p-6">
-                      <h3 className="text-lg font-semibold text-brand-800 mb-4">Capteurs</h3>
-                      <p className="text-gray-600 leading-relaxed">
-                        Une possibilité reste les capteurs, même si elle n'est pas applicable en match officiel. Avec l'acquisition, un RandomForestClassifier nous prédirait la probabilité qu'un tir soit un but lors d'une faute. Ces prédictions seraient corrigées avec des techniques comme le Frequent Itemset Mining (FIM) (par exemple, l'algorithme Apriori) pour analyser les séquences d'annotations et identifier les corrélations entre les événements.
-                        <button 
-                          onClick={() => setSelectedReference(1)}
-                          className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
-                        >
-                          <sup>[1]</sup>
-                        </button>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Event Detection Section */}
-                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                    <div className="p-4 sm:p-6">
-                      <h3 className="text-lg font-semibold text-brand-800 mb-4">Détection d'événement</h3>
-                      <div className="space-y-4">
-                        <p className="text-gray-600 leading-relaxed">
-                          L'avantage de la manière dont nous avons décrit le calcul de la possession est que les pertes de possession permettent la détection de tirs, en définissant un événement de tir comme une perte de possession par un joueur de l'équipe attaquante suivie d'un but, d'un corner, d'un six mètres ou d'un arrêt. 
-                        </p>
-                        
-                        <p className="text-gray-600 leading-relaxed">
-                          Le problème d'une telle méthode est que les tirs contrés ne sont pas définis comme des tirs. Un tir est considéré comme cadré si, dans notre plan 2D, il passe par les coordonnées de la cage et qu'il n'y a pas de remise en jeu via un coup de pied arrêté ou un coup d'envoi, ou s'il y a un arrêt. Un arrêt, dans la même logique que les tirs, est détecté par un gain de possession, par le gradient dans la surface de réparation et précédé d'un tir (de même que pour un tir contré qui lui revient dessus, ceci est une limite).
-                        </p>
-
-                        <div className="bg-gray-50 rounded-lg p-1">
-                          <img
-                            src="/foul1.png"
-                            alt="Arbre de décision pour la classification des tirs"
-                            className="w-full h-auto object-contain max-h-[300px] sm:max-h-[400px]"
-                          />
-                          <p className="text-xs sm:text-sm text-gray-500 mt-1 text-center">
-                            Arbre de décision pour la classification des tirs
-                          </p>
-                        </div>
-
-                        <p className="text-gray-600 leading-relaxed">
-                          Cette technique nous permet d'avoir une précision de 78 % et un recall de 53 %, dû au fait que les tirs contrés sont considérés comme des passes, de même que les tirs qui partiraient de la "cross zone" ou de la "other zone". L'article en question, mais aussi le tracking, limite ce type de détection où les occlusions des joueurs seraient mal gérées.
-                          <button 
-                            onClick={() => setSelectedReference(2)}
-                            className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
-                          >
-                            <sup>[2]</sup>
-                          </button>
-                        </p>
                       </div>
                     </div>
                   </div>

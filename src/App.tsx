@@ -55,18 +55,13 @@ const defaultMatchData = {
       odds: { home: 1.90, draw: 3.45, away: 4.10 }
     },
     corners: {
-      home: 9,
-      away: 2,
+      home: 65,
+      away: 59,
       algorithm: "Détection automatique des corners via notre système de tracking vidéo. Les caméras suivent la sortie du ballon et sa position exacte sur le terrain.",
       odds: { home: 2.10, draw: 3.20, away: 3.60 },
       trend: 'down' as const
     },
-    fouls: {
-      home: 8,
-      away: 15,
-      algorithm: "Analyse en temps réel des contacts entre joueurs via notre système de computer vision. L'IA évalue l'intensité et la nature des contacts pour identifier les fautes.",
-      odds: { home: 2.25, draw: 3.30, away: 3.15 }
-    }
+  
   }
 };
 
