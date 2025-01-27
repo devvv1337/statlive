@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Info, Clock, BarChart2, Trophy, X, Star, AlertTriangle, Zap, ChevronDown, Camera } from 'lucide-react';
+import { Info, Clock, BarChart2, X, Star, AlertTriangle, Zap, ChevronDown, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LazyImage from './LazyImage';
 
