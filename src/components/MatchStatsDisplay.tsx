@@ -1184,7 +1184,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                       <h3 className="text-lg font-semibold text-brand-800 mb-4">Détection d'événements et classification</h3>
                       <div className="space-y-2">
                         <p className="text-gray-600 leading-relaxed">
-                          La première méthode fonctionne avec des arbres de décision. Après avoir effectué le suivi des joueurs, on applique nos méthodes présentées dans la partie "possessions" afin de connaître l'équipe titulaire du ballon (qui sera l'équipe qui marque).
+                          La première méthode fonctionne avec des arbres de décision. Après avoir effectué le suivi des joueurs, on applique nos méthodes présentées dans la partie "possessions" afin de connaître l'équipe titulaire du ballon (qui sera l'équipe qui marque).  Celle-ci détecte s’il y a un tir comme présenté dans la partie "tir" de la ressource pédagogique. Après cette frappe, notre modèle va chercher à savoir si actuellement nous sommes dans un temps de "dead ball interval". Cela indique que le jeu s’est arrêté et que la frappe n’a pas été arrêtée. Cette zone de non-possessions signifie qu’elle ne respecte pas les contraintes de possession décrites dans cette partie du même nom et/ou que la balle n’est plus dans les limites du terrain. Enfin, après ce "dead ball interval", le modèle va rechercher plusieurs patterns pour détecter la raison de cet événement et ainsi le classifier en suivant la méthodologie de la photo ci-dessous :
                         </p>
 
                         <div className="bg-gray-50 rounded-lg p-1">
@@ -1196,10 +1196,6 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                           <p className="text-xs sm:text-sm text-gray-500 mt-1 text-center">Méthodologie de classification des événements</p>
                         </div>
 
-                        <p className="text-gray-600 leading-relaxed">
-                          Si tous les joueurs sont dans leur moitié de terrain et qu'au moins un joueur est dans le cercle central, nous pouvons classer cet événement comme un but pour l'équipe qui avait la possession.
-                        </p>
-
                         <div className="bg-gray-50 rounded-lg p-1">
                           <img
                             src="/goal2.png"
@@ -1208,6 +1204,16 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                           />
                           <p className="text-xs sm:text-sm text-gray-500 mt-1 text-center">Position des joueurs après un but</p>
                         </div>
+
+                        <p className="text-gray-600 leading-relaxed">
+                          Ainsi, si tous les joueurs sont dans leur moitié de terrain et qu’au moins un joueur est dans le cercle central comme le montre la seconde photo, alors nous pouvons prendre la décision de classer cet événement comme un but pour l’équipe qui avait la possession. Cependant, ces méthodes sont limitées, notamment pour des buts à la dernière seconde de la mi-temps où le coup d’envoi n’a pas lieu. Quand c’est le cas, l’algorithme compte cela comme un but si le match se termine par un "dead ball interval" et que celui-ci était un tir allant dans le cadre de la cage sur un plan 2D uniquement. De plus, pour éviter les cas où le coup d’envoi doit être rejoué, une variable k représentant le nombre de coups d’envoi est initialisée. Celle-ci ne s’incrémente pas si la balle n’est pas rentrée dans au moins une des surfaces de réparation. Ce type de méthode a été évalué à 96% de précision et 91% de rappel.
+                          <button 
+                            onClick={() => setSelectedReference(2)}
+                            className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
+                          >
+                            <sup>[1]</sup>
+                          </button>
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1217,7 +1223,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                     <div className="p-4 sm:p-6">
                       <h3 className="text-lg font-semibold text-brand-800 mb-4">Capteurs</h3>
                       <p className="text-gray-600 leading-relaxed">
-                        Si l'on utilise des capteurs sur des joueurs, il est conseillé d'utiliser du Machine Learning, tel qu'un RandomForestClassifier, qui s'entraînerait sur nos données collectées dans le but de prédire des buts
+                        Si l’on utilise des capteurs sur des joueurs, il est conseillé d’utiliser du Machine Learning, tel qu’un RandomForestClassifier, qui s’entraînerait sur nos données collectées dans le but de prédire des buts. Après cette classification, on peut utiliser des techniques de Frequent Itemset Mining (FIM) (par exemple, l'algorithme Apriori) pour analyser les séquences d'annotations et identifier les corrélations entre les événements, afin de détecter de potentielles erreurs de classification, notamment en créant des règles d’association avec un dataset d’entraînement et chercher à détecter ce type de règle lors de la prédiction d’un but.
                         <button 
                           onClick={() => setSelectedReference(12)}
                           className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
@@ -1225,16 +1231,6 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                           <sup>[2]</sup>
                         </button>
                       </p>
-
-                      <div className="bg-gray-50 rounded-xl p-4 mt-4">
-                        <h4 className="text-brand-800 font-semibold mb-3">Techniques utilisées</h4>
-                        <ul className="list-disc pl-6 space-y-2 text-gray-600">
-                          <li>Frequent Itemset Mining (FIM)</li>
-                          <li>Algorithme Apriori</li>
-                          <li>Analyse des séquences d'annotations</li>
-                          <li>Règles d'association</li>
-                        </ul>
-                      </div>
                     </div>
                   </div>
 
@@ -1269,6 +1265,10 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
 
                         <div className="bg-gray-50 rounded-xl p-4">
                           <h4 className="text-brand-800 font-semibold mb-3">Résultats par type de but</h4>
+                          <p className="text-gray-600 leading-relaxed">
+                            Ces prédictions sont comparées à l’ensemble de données SVE (Soccer Video Events) pour calculer le score d’accuracy, qui atteint 89 % pour un but "normal", 88 % pour les buts de la tête et 98 % pour un but sur penalty. Ce résultat est mis en perspective avec d’autres techniques utilisées, où les résultats sont respectivement :
+                          </p>
+
                           <div className="grid grid-cols-2 gap-4">
                             <div className="bg-white p-3 rounded-lg text-center">
                               <div className="text-xl font-bold text-brand-600">89%</div>
@@ -1283,6 +1283,83 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                               <div className="text-sm text-gray-500">But sur penalty</div>
                             </div>
                           </div>
+
+                          <div className="bg-gray-100 p-4 rounded-lg">
+                            <h2 className="text-lg font-semibold mb-4">ResNet50+MLSTM</h2>
+                            <div className="grid grid-cols-3 gap-4">
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-brand-600">89%</div>
+                                <div className="text-sm text-gray-500">But normal</div>
+                              </div>
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-brand-600">88%</div>
+                                <div className="text-sm text-gray-500">But de la tête</div>
+                              </div>
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-betting-win">98%</div>
+                                <div className="text-sm text-gray-500">But sur penalty</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Tableau 2 */}
+                          <div className="bg-gray-100 p-4 rounded-lg">
+                            <h2 className="text-lg font-semibold mb-4">HOG+SVM</h2>
+                            <div className="grid grid-cols-3 gap-4">
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-brand-600">89%</div>
+                                <div className="text-sm text-gray-500">But normal</div>
+                              </div>
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-brand-600">64%</div>
+                                <div className="text-sm text-gray-500">But de la tête</div>
+                              </div>
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-betting-win">69%</div>
+                                <div className="text-sm text-gray-500">But sur penalty</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Tableau 3 */}
+                          <div className="bg-gray-100 p-4 rounded-lg">
+                            <h2 className="text-lg font-semibold mb-4">AlexNet+MLSTM</h2>
+                            <div className="grid grid-cols-3 gap-4">
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-brand-600">79%</div>
+                                <div className="text-sm text-gray-500">But normal</div>
+                              </div>
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-brand-600">93%</div>
+                                <div className="text-sm text-gray-500">But de la tête</div>
+                              </div>
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-betting-win">92%</div>
+                                <div className="text-sm text-gray-500">But sur penalty</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Tableau 4 */}
+                          <div className="bg-gray-100 p-4 rounded-lg">
+                            <h2 className="text-lg font-semibold mb-4">GoogleNet+MLSTM</h2>
+                            <div className="grid grid-cols-3 gap-4">
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-brand-600">89%</div>
+                                <div className="text-sm text-gray-500">But normal</div>
+                              </div>
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-brand-600">93%</div>
+                                <div className="text-sm text-gray-500">But de la tête</div>
+                              </div>
+                              <div className="bg-white p-3 rounded-lg text-center">
+                                <div className="text-xl font-bold text-betting-win">98%</div>
+                                <div className="text-sm text-gray-500">But sur penalty</div>
+                              </div>
+                            </div>
+                          </div>
+
+
                           <button 
                             onClick={() => setSelectedReference(13)}
                             className="inline-flex items-center text-brand-600 hover:text-brand-700 mt-3"
