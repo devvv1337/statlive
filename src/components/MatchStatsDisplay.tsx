@@ -814,7 +814,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                                   <p className="text-sm text-gray-500 mt-2 text-center">Détection des joueurs avec YOLOv7</p>
                                 </div>
 
-                                <p className="mt-4">Ensuite, un DAN (Deep Affinity Network), basé sur une architecture VGG (Visual Geometry Group), peut être appliqué. Ce réseau produit des vecteurs de caractéristiques de 520 dimensions pour chaque joueur détecté, permettant de comparer ces vecteurs entre images consécutives afin d'associer des IDs uniques à chaque joueur.</p>
+                                <p className="mt-4">Ensuite, un DAN (Deep Affinity Network), basé sur une architecture VGG (Visual Geometry Group), peut être appliqué. Ce réseau produit des vecteurs de caractéristiques de 520 dimensions pour chaque joueur détecté, permettant de comparer ces vecteurs entre images consécutives afin d'associer des IDs uniques à chaque joueur. Cependant, cette méthode présente des difficultés face à l’occlusion, notamment lorsque la distance euclidienne entre deux joueurs est inférieure à 4 pixels.</p>
                                 <p className="mt-2">Il est également possible de lisser les trajectoires des joueurs et de réduire le bruit en appliquant des filtres tels que le filtre Savitzky-Golay. Cela améliore la continuité des trajectoires et augmente la précision à 90,5%. Cependant, cette approche est difficile à mettre en œuvre en temps réel, car le traitement complet d'un match peut nécessiter environ 24 heures
                                   <button 
                                     onClick={() => setSelectedReference(6)}
@@ -828,7 +828,14 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                               <div>
                                 <h5 className="text-brand-700 font-medium mb-2">3. Méthodes alternatives</h5>
                                 <p>Une autre méthode, basée sur une idée similaire à la précédente, consisterait à remplacer le DAN par DeepSORT (Deep Simple Online and Real-time Tracking). Ce système permet de suivre les joueurs et de leur assigner des identifiants uniques. En le combinant avec un algorithme K-Means, il serait possible de distinguer les joueurs des deux équipes en fonction de la couleur de leurs maillots.</p>
-                                <p className="mt-2">Cette approche permettrait également d'obtenir une visualisation 2D du terrain vue du dessus, en utilisant un GAN (Generative Adversarial Networks) pour extraire les lignes du terrain et isoler la pelouse, comme illustré ci-dessous.</p>
+                                <p className="mt-2">Cette approche permettrait également d'obtenir une visualisation 2D du terrain vue du dessus, en utilisant un GAN (Generative Adversarial Networks) pour extraire les lignes du terrain et isoler la pelouse, comme illustré ci-dessous.
+                                  <button 
+                                    onClick={() => setSelectedReference(7)}
+                                    className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
+                                  >
+                                    <sup>[7]</sup>
+                                  </button>
+                                </p>
 
                                 <div className="mt-4 bg-gray-50 rounded-xl p-4">
                                   <div className="relative aspect-[16/9] w-full">
