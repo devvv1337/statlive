@@ -1269,21 +1269,6 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                             Ces prédictions sont comparées à l’ensemble de données SVE (Soccer Video Events) pour calculer le score d’accuracy, qui atteint 89 % pour un but "normal", 88 % pour les buts de la tête et 98 % pour un but sur penalty. Ce résultat est mis en perspective avec d’autres techniques utilisées, où les résultats sont respectivement :
                           </p>
 
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-white p-3 rounded-lg text-center">
-                              <div className="text-xl font-bold text-brand-600">89%</div>
-                              <div className="text-sm text-gray-500">But normal</div>
-                            </div>
-                            <div className="bg-white p-3 rounded-lg text-center">
-                              <div className="text-xl font-bold text-brand-600">88%</div>
-                              <div className="text-sm text-gray-500">But de la tête</div>
-                            </div>
-                            <div className="bg-white p-3 rounded-lg text-center">
-                              <div className="text-xl font-bold text-betting-win">98%</div>
-                              <div className="text-sm text-gray-500">But sur penalty</div>
-                            </div>
-                          </div>
-
                           <div className="bg-gray-100 p-4 rounded-lg">
                             <h2 className="text-lg font-semibold mb-4">ResNet50+MLSTM</h2>
                             <div className="grid grid-cols-3 gap-4">
