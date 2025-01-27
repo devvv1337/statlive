@@ -3,7 +3,7 @@ import { Info, Clock, BarChart2, X, Star, AlertTriangle, Zap, ChevronDown, Camer
 import { motion, AnimatePresence } from 'framer-motion';
 import LazyImage from './LazyImage';
 
-export interface MatchStats {
+interface MatchStats {
   home: number;
   away: number;
   algorithm: string;
@@ -12,7 +12,7 @@ export interface MatchStats {
   trend?: 'up' | 'down' | 'stable';
 }
 
-export interface MatchData {
+interface MatchData {
   id: string;
   homeTeam: string;
   awayTeam: string;
@@ -25,7 +25,8 @@ export interface MatchData {
   redCards: {
     home: number;
     away: number;
-    homePlayers: string[];
+    homePlayers?: string[];
+    awayPlayers?: string[];
   };
   stats: {
     possession: MatchStats;
@@ -35,10 +36,6 @@ export interface MatchData {
     corners: MatchStats;
     fouls: MatchStats;
   };
-}
-
-interface Props {
-  matchData: MatchData;
 }
 
 interface Reference {
@@ -138,7 +135,68 @@ const teamCompositions = {
   }
 };
 
-const MatchStatsDisplay: React.FC<Props> = ({ matchData }) => {
+interface Props {
+  matchData: MatchData;
+}
+
+const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
+  id: "L1-2024-OM-OL",
+  homeTeam: "OM",
+  awayTeam: "OL",
+  score: {
+    home: 3,
+    away: 2
+  },
+  time: "87'",
+  league: "Ligue 1 McDonald's",
+  redCards: {
+    home: 1,
+    away: 0,
+    homePlayers: ["Leonardo Balerdi"]
+  },
+  stats: {
+    possession: {
+      home: 65,
+      away: 35,
+      algorithm: "Calculé en temps réel basé sur le temps de contrôle effectif du ballon via computer vision et machine learning. Notre système utilise des caméras haute définition pour suivre la position du ballon et des joueurs, permettant une analyse précise de la possession.",
+      odds: { home: 1.85, draw: 3.40, away: 4.20 },
+      trend: 'up'
+    },
+    shots: {
+      home: 18,
+      away: 4,
+      algorithm: "Détection automatique des tirs via analyse vidéo et intelligence artificielle. Notre système reconnaît les mouvements caractéristiques des tirs et utilise des capteurs de vitesse pour mesurer la puissance.",
+      odds: { home: 1.95, draw: 3.50, away: 3.80 },
+      suspended: true
+    },
+    passes: {
+      home: 385,
+      away: 198,
+      algorithm: "Comptage des échanges de balle réussis entre coéquipiers grâce à notre système de tracking optique avancé. L'IA analyse les trajectoires du ballon pour identifier les passes intentionnelles.",
+      odds: { home: 1.75, draw: 3.60, away: 4.50 },
+      trend: 'stable'
+    },
+    xG: {
+      home: 5.24,
+      away: 1.12,
+      algorithm: "Expected Goals (xG) calculé en temps réel en utilisant le machine learning. Notre modèle analyse la position du tir, l'angle, la pression des défenseurs et l'historique des situations similaires.",
+      odds: { home: 1.90, draw: 3.45, away: 4.10 }
+    },
+    corners: {
+      home: 9,
+      away: 2,
+      algorithm: "Détection automatique des corners via notre système de tracking vidéo. Les caméras suivent la sortie du ballon et sa position exacte sur le terrain.",
+      odds: { home: 2.10, draw: 3.20, away: 3.60 },
+      trend: 'down'
+    },
+    fouls: {
+      home: 8,
+      away: 15,
+      algorithm: "Analyse en temps réel des contacts entre joueurs via notre système de computer vision. L'IA évalue l'intensité et la nature des contacts pour identifier les fautes.",
+      odds: { home: 2.25, draw: 3.30, away: 3.15 }
+    }
+  }
+} }) => {
   const [selectedStat, setSelectedStat] = useState<string | null>(null);
   const [showHighlightModal, setShowHighlightModal] = useState(false);
   const [selectedComposition, setSelectedComposition] = useState<'home' | 'away' | null>(null);
@@ -766,7 +824,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData }) => {
                                   <p className="text-sm text-gray-500 mt-2 text-center">Détection des joueurs avec YOLOv7</p>
                                 </div>
 
-                                <p className="mt-4">Ensuite, un DAN (Deep Affinity Network), basé sur une architecture VGG (Visual Geometry Group), peut être appliqué. Ce réseau produit des vecteurs de caractéristiques de 520 dimensions pour chaque joueur détecté, permettant de comparer ces vecteurs entre images consécutives afin d'associer des IDs uniques à chaque joueur. Cependant, cette méthode présente des difficultés face à l'occlusion, notamment lorsque la distance euclidienne entre deux joueurs est inférieure à 4 pixels.</p>
+                                <p className="mt-4">Ensuite, un DAN (Deep Affinity Network), basé sur une architecture VGG (Visual Geometry Group), peut être appliqué. Ce réseau produit des vecteurs de caractéristiques de 520 dimensions pour chaque joueur détecté, permettant de comparer ces vecteurs entre images consécutives afin d'associer des IDs uniques à chaque joueur. Cependant, cette méthode présente des difficultés face à l’occlusion, notamment lorsque la distance euclidienne entre deux joueurs est inférieure à 4 pixels.</p>
                                 <p className="mt-2">Il est également possible de lisser les trajectoires des joueurs et de réduire le bruit en appliquant des filtres tels que le filtre Savitzky-Golay. Cela améliore la continuité des trajectoires et augmente la précision à 90,5%. Cependant, cette approche est difficile à mettre en œuvre en temps réel, car le traitement complet d'un match peut nécessiter environ 24 heures
                                   <button 
                                     onClick={() => setSelectedReference(6)}
@@ -812,7 +870,8 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData }) => {
                             </div>
                           </div>
                         </div>
-                      )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1135,7 +1194,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData }) => {
                       <h3 className="text-lg font-semibold text-brand-800 mb-4">Détection d'événements et classification</h3>
                       <div className="space-y-2">
                         <p className="text-gray-600 leading-relaxed">
-                          La première méthode fonctionne avec des arbres de décision. Après avoir effectué le suivi des joueurs, on applique nos méthodes présentées dans la partie "possessions" afin de connaître l'équipe titulaire du ballon (qui sera l'équipe qui marque).  Celle-ci détecte s'il y a un tir comme présenté dans la partie "tir" de la ressource pédagogique. Après cette frappe, notre modèle va chercher à savoir si actuellement nous sommes dans un temps de "dead ball interval". Cela indique que le jeu s'est arrêté et que la frappe n'a pas été arrêtée. Cette zone de non-possessions signifie qu'elle ne respecte pas les contraintes de possession décrites dans cette partie du même nom et/ou que la balle n'est plus dans les limites du terrain. Enfin, après ce "dead ball interval", le modèle va rechercher plusieurs patterns pour détecter la raison de cet événement et ainsi le classifier en suivant la méthodologie de la photo ci-dessous :
+                          La première méthode fonctionne avec des arbres de décision. Après avoir effectué le suivi des joueurs, on applique nos méthodes présentées dans la partie "possessions" afin de connaître l'équipe titulaire du ballon (qui sera l'équipe qui marque).  Celle-ci détecte s’il y a un tir comme présenté dans la partie "tir" de la ressource pédagogique. Après cette frappe, notre modèle va chercher à savoir si actuellement nous sommes dans un temps de "dead ball interval". Cela indique que le jeu s’est arrêté et que la frappe n’a pas été arrêtée. Cette zone de non-possessions signifie qu’elle ne respecte pas les contraintes de possession décrites dans cette partie du même nom et/ou que la balle n’est plus dans les limites du terrain. Enfin, après ce "dead ball interval", le modèle va rechercher plusieurs patterns pour détecter la raison de cet événement et ainsi le classifier en suivant la méthodologie de la photo ci-dessous :
                         </p>
 
                         <div className="bg-gray-50 rounded-lg p-1">
@@ -1157,7 +1216,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData }) => {
                         </div>
 
                         <p className="text-gray-600 leading-relaxed">
-                          Ainsi, si tous les joueurs sont dans leur moitié de terrain et qu'au moins un joueur est dans le cercle central comme le montre la seconde photo, alors nous pouvons prendre la décision de classer cet événement comme un but pour l'équipe qui avait la possession. Cependant, ces méthodes sont limitées, notamment pour des buts à la dernière seconde de la mi-temps où le coup d'envoi n'a pas lieu. Quand c'est le cas, l'algorithme compte cela comme un but si le match se termine par un "dead ball interval" et que celui-ci était un tir allant dans le cadre de la cage sur un plan 2D uniquement. De plus, pour éviter les cas où le coup d'envoi doit être rejoué, une variable k représentant le nombre de coups d'envoi est initialisée. Celle-ci ne s'incrémente pas si la balle n'est pas rentrée dans au moins une des surfaces de réparation. Ce type de méthode a été évalué à 96% de précision et 91% de rappel.
+                          Ainsi, si tous les joueurs sont dans leur moitié de terrain et qu’au moins un joueur est dans le cercle central comme le montre la seconde photo, alors nous pouvons prendre la décision de classer cet événement comme un but pour l’équipe qui avait la possession. Cependant, ces méthodes sont limitées, notamment pour des buts à la dernière seconde de la mi-temps où le coup d’envoi n’a pas lieu. Quand c’est le cas, l’algorithme compte cela comme un but si le match se termine par un "dead ball interval" et que celui-ci était un tir allant dans le cadre de la cage sur un plan 2D uniquement. De plus, pour éviter les cas où le coup d’envoi doit être rejoué, une variable k représentant le nombre de coups d’envoi est initialisée. Celle-ci ne s’incrémente pas si la balle n’est pas rentrée dans au moins une des surfaces de réparation. Ce type de méthode a été évalué à 96% de précision et 91% de rappel.
                           <button 
                             onClick={() => setSelectedReference(2)}
                             className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
@@ -1174,7 +1233,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData }) => {
                     <div className="p-4 sm:p-6">
                       <h3 className="text-lg font-semibold text-brand-800 mb-4">Capteurs</h3>
                       <p className="text-gray-600 leading-relaxed">
-                        Si l'on utilise des capteurs sur des joueurs, il est conseillé d'utiliser du Machine Learning, tel qu'un RandomForestClassifier, qui s'entraînerait sur nos données collectées dans le but de prédire des buts. Après cette classification, on peut utiliser des techniques de Frequent Itemset Mining (FIM) (par exemple, l'algorithme Apriori) pour analyser les séquences d'annotations et identifier les corrélations entre les événements, afin de détecter de potentielles erreurs de classification, notamment en créant des règles d'association avec un dataset d'entraînement et chercher à détecter ce type de règle lors de la prédiction d'un but.
+                        Si l’on utilise des capteurs sur des joueurs, il est conseillé d’utiliser du Machine Learning, tel qu’un RandomForestClassifier, qui s’entraînerait sur nos données collectées dans le but de prédire des buts. Après cette classification, on peut utiliser des techniques de Frequent Itemset Mining (FIM) (par exemple, l'algorithme Apriori) pour analyser les séquences d'annotations et identifier les corrélations entre les événements, afin de détecter de potentielles erreurs de classification, notamment en créant des règles d’association avec un dataset d’entraînement et chercher à détecter ce type de règle lors de la prédiction d’un but.
                         <button 
                           onClick={() => setSelectedReference(12)}
                           className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
@@ -1217,7 +1276,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData }) => {
                         <div className="bg-gray-50 rounded-xl p-4">
                           <h4 className="text-brand-800 font-semibold mb-3">Résultats par type de but</h4>
                           <p className="text-gray-600 leading-relaxed">
-                            Ces prédictions sont comparées à l'ensemble de données SVE (Soccer Video Events) pour calculer le score d'accuracy, qui atteint 89 % pour un but "normal", 88 % pour les buts de la tête et 98 % pour un but sur penalty. Ce résultat est mis en perspective avec d'autres techniques utilisées, où les résultats sont respectivement :
+                            Ces prédictions sont comparées à l’ensemble de données SVE (Soccer Video Events) pour calculer le score d’accuracy, qui atteint 89 % pour un but "normal", 88 % pour les buts de la tête et 98 % pour un but sur penalty. Ce résultat est mis en perspective avec d’autres techniques utilisées, où les résultats sont respectivement :
                           </p>
 
                           <div className="bg-gray-100 p-4 rounded-lg">
@@ -1537,4 +1596,4 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData }) => {
   );
 };
 
-export { MatchStatsDisplay as default }; 
+export default MatchStatsDisplay; 
