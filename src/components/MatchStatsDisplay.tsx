@@ -316,58 +316,63 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
         {/* Central Stats Section */}
         <div className="flex-1 bg-gradient-to-b from-brand-800 to-brand-700 lg:mx-4">
           {/* Header */}
-          <div className="text-white p-6 pb-8">
+          <div className="text-white p-4">
             <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-3">
-                <img src="/ligue1logo.png" alt="Logo Ligue 1" className="h-6 w-auto object-contain" />
-                <span className="text-sm font-medium">{matchData.league}</span>
+              <div className="flex items-center gap-2 sm:gap-4">
+                <img src="/ligue1logo.png" alt="Logo Ligue 1" className="h-5 sm:h-8 w-auto object-contain" />
+                <span className="text-xs sm:text-base font-medium">{matchData.league}</span>
               </div>
               <button 
                 onClick={() => setIsFavorite(!isFavorite)} 
                 className={`hover:scale-110 transition-all duration-300 ${isFavorite ? 'text-betting-win' : 'hover:text-betting-win'}`} 
                 aria-label="Favori"
               >
-                <Star size={16} className={isFavorite ? 'fill-current' : ''} />
+                <Star size={14} className={`sm:w-6 sm:h-6 ${isFavorite ? 'fill-current' : ''}`} />
               </button>
             </div>
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-4">
-                <img src="/omlogo.png" alt="Logo OM" className="w-20 h-20 object-contain" />
+            <div className="flex justify-between items-center">
+              {/* Home Team */}
+              <div className="flex items-center gap-2 sm:gap-6">
+                <img src="/omlogo.png" alt="Logo OM" className="w-16 h-16 sm:w-32 sm:h-32 object-contain" />
                 <div className="flex flex-col items-start">
-                  <div className="text-4xl font-bold h-[48px] flex items-center">{matchData.homeTeam}</div>
+                  <div className="text-lg sm:text-4xl font-bold">{matchData.homeTeam}</div>
                   {matchData.redCards.home > 0 && (
                     <button 
                       onClick={() => setShowRedCardInfo(true)}
-                      className="flex items-center gap-2 mt-1 hover:bg-white/10 px-2 py-1 rounded-lg transition-colors"
+                      className="flex items-center gap-1 sm:gap-2 hover:bg-white/10 px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-lg transition-colors"
                     >
-                      <div className="w-4 h-6 bg-red-600 rounded-sm"></div>
-                      <span className="text-sm text-white/80">Balerdi</span>
-                      <Info size={14} className="text-white/60" />
+                      <div className="w-3 h-4 sm:w-4 sm:h-6 bg-red-600 rounded-sm"></div>
+                      <span className="text-xs sm:text-base text-white/80">Balerdi</span>
+                      <Info size={12} className="text-white/60 sm:w-5 sm:h-5" />
                     </button>
                   )}
                 </div>
               </div>
-              <div className="flex flex-col items-center">
+              {/* Score */}
+              <div className="flex flex-col items-center mx-2 sm:mx-8">
                 <button
                   onClick={() => setShowGoalInfo(true)}
-                  className="text-white/80 hover:text-white flex items-center gap-1 mb-2 text-sm"
+                  className="text-white/80 hover:text-white flex items-center gap-1 sm:gap-2 mb-1 text-xs sm:text-base"
                 >
-                  <Info size={14} />
+                  <Info size={12} className="sm:w-5 sm:h-5" />
                   <span>Détection des buts</span>
                 </button>
-                <div className="text-3xl font-bold tracking-tight flex items-center gap-4">
+                <div className="text-xl sm:text-5xl font-bold tracking-tight flex items-center gap-3 sm:gap-6">
                   <span>{matchData.score.home}</span>
                   <span>-</span>
                   <span>{matchData.score.away}</span>
                 </div>
-                <div className="text-sm text-white/80 flex items-center gap-1 mt-1">
-                  <Clock size={12} />
+                <div className="text-xs sm:text-base text-white/80 flex items-center gap-1 sm:gap-2 mt-1">
+                  <Clock size={10} className="sm:w-5 sm:h-5" />
                   <span>{matchData.time}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="text-4xl font-bold h-[48px] flex items-center">{matchData.awayTeam}</div>
-                <img src="/ollogo.png" alt="Logo OL" className="w-14 h-14 object-contain" />
+              {/* Away Team */}
+              <div className="flex items-center gap-2 sm:gap-6">
+                <div className="flex flex-col items-end">
+                  <div className="text-lg sm:text-4xl font-bold">{matchData.awayTeam}</div>
+                </div>
+                <img src="/ollogo.png" alt="Logo OL" className="w-16 h-16 sm:w-32 sm:h-32 object-contain" />
               </div>
             </div>
           </div>
