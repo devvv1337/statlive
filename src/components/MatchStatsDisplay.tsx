@@ -109,6 +109,16 @@ const references: Reference[] = [
     id: 13,
     text: "Classification d'événements avec MLSTM",
     url: "https://ntnuopen.ntnu.no/ntnu-xmlui/bitstream/handle/11250/3011129/AI-Driven_Salient_Soccer_Events_Recognition_Framework_for_Next_Generation_IoT-Enabled_Environments.pdf"
+  },
+  {
+    id: 14,
+    text: "Utilisation des capteurs pour la possession",
+    url: "https://arxiv.org/pdf/2103.02938"
+  },
+  {
+    id: 15,
+    text: "Détection d'événements et possession",
+    url: "https://link.springer.com/article/10.1007/s12283-022-00381-6"
   }
 ];
 
@@ -1000,13 +1010,13 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                       <h3 className="text-lg font-semibold text-brand-800 mb-4">Méthode Manuelle</h3>
                       <p className="text-gray-600 leading-relaxed">
                         La première solution, qui semble évidente, consisterait à effectuer un suivi manuel, où un technicien chargé de collecter les statistiques du match reporterait l'intégralité des données à la main
-                    <button 
-                      onClick={() => setSelectedReference(9)}
-                      className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
-                    >
-                      <sup>[1]</sup>
-                    </button>
-                  </p>
+                        <button 
+                          onClick={() => setSelectedReference(9)}
+                          className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
+                        >
+                          <sup>[1]</sup>
+                        </button>
+                      </p>
                     </div>
                   </div>
 
@@ -1038,7 +1048,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                             <li>La corrélation des mouvements des joueurs</li>
                             <li>Les actions contextuelles (comme les fautes)</li>
                             <li>Les indices visuels spécifiques</li>
-                  </ul>
+                          </ul>
                         </div>
 
                         <div className="bg-gray-50 rounded-xl p-4">
@@ -1067,14 +1077,14 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                         </div>
 
                         <div className="mt-6">
-                    <div className="relative aspect-[16/9] w-full">
-                      <img
-                        src="/redcard.png"
-                        alt="Détection de carton rouge"
-                        className="w-full h-full object-contain rounded-lg shadow-md"
-                      />
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2 text-center">Détection de carton rouge avec MLSTM</p>
+                          <div className="relative aspect-[16/9] w-full">
+                            <img
+                              src="/redcard.png"
+                              alt="Détection de carton rouge"
+                              className="w-full h-full object-contain rounded-lg shadow-md"
+                            />
+                          </div>
+                          <p className="text-sm text-gray-500 mt-2 text-center">Détection de carton rouge avec MLSTM</p>
                         </div>
                       </div>
                     </div>
@@ -1384,6 +1394,180 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                     >
                       <div className="flex justify-between items-start mb-4">
                         <h3 className="text-lg font-semibold text-brand-800">Référence [{selectedReference === 11 ? '1' : selectedReference === 12 ? '2' : '3'}]</h3>
+                        <button
+                          onClick={() => setSelectedReference(null)}
+                          className="p-1 hover:bg-gray-100 rounded-full"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                      <p className="text-gray-600 mb-4">{references[selectedReference - 1].text}</p>
+                      <a
+                        href={references[selectedReference - 1].url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-brand-600 hover:text-brand-700 underline break-all"
+                      >
+                        {references[selectedReference - 1].url}
+                      </a>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Possession Info Modal */}
+      <AnimatePresence>
+        {selectedStat === 'possession' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              className="bg-white w-full sm:rounded-2xl sm:max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
+            >
+              {/* Modal Header */}
+              <div className="bg-brand-800 text-white p-4 sm:p-6 flex-shrink-0">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-3">
+                    <div className="p-2 bg-white/10 rounded-lg">
+                      <BarChart2 size={24} className="text-betting-win" />
+                    </div>
+                    Détection de la Possession
+                  </h2>
+                  <button
+                    onClick={() => setSelectedStat(null)}
+                    className="p-2 hover:bg-white/10 active:bg-white/20 rounded-full transition-colors"
+                    aria-label="Fermer"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Content - Scrollable */}
+              <div className="p-4 sm:p-8 overflow-y-auto flex-1">
+                {/* Introduction */}
+                <div className="bg-gray-50 rounded-xl p-4 sm:p-6 shadow-md mb-6">
+                  <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+                    La statistique de possession est sûrement l'une des plus utiles puisqu'elle permet de distinguer quelle équipe a déclenché l'événement, c'est-à-dire quelle équipe vient de marquer ou quel joueur vient de tirer, etc.
+                  </p>
+                </div>
+
+                {/* Main Methods Section */}
+                <div className="space-y-6">
+                  {/* Capteurs Section */}
+                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div className="p-4 sm:p-6">
+                      <h3 className="text-lg font-semibold text-brand-800 mb-4">Capteurs</h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        Une possibilité reste les capteurs, même si elle n'est pas applicable en match officiel. Avec l'acquisition, un RandomForestClassifier nous prédirait la possession du ballon. Ces prédictions seraient corrigées avec des techniques comme le Frequent Itemset Mining (FIM) (par exemple, l'algorithme Apriori) pour analyser les séquences d'annotations et identifier les corrélations entre les événements.
+                        <button 
+                          onClick={() => setSelectedReference(14)}
+                          className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
+                        >
+                          <sup>[1]</sup>
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Event Detection Section */}
+                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div className="p-4 sm:p-6">
+                      <h3 className="text-lg font-semibold text-brand-800 mb-4">Détection d'événements</h3>
+                      <div className="space-y-4">
+                        <p className="text-gray-600 leading-relaxed">
+                          L'une des méthodes qui semble la plus appropriée reste celle utilisée dans notre article de détection d'événements.
+                          Celle-ci utilise le tracking des joueurs et du ballon pour déterminer quel joueur, de quelle équipe, est le plus proche du ballon et assigne ainsi la possession à ce dernier, comme on le voit ci-dessous :
+                        </p>
+
+                        <div className="bg-gray-50 rounded-lg p-1">
+                          <img
+                            src="/possession1.png"
+                            alt="Détection de la possession"
+                            className="w-full h-auto object-contain max-h-[300px] sm:max-h-[400px]"
+                          />
+                          <p className="text-xs sm:text-sm text-gray-500 mt-1 text-center">Détection de la possession par tracking</p>
+                        </div>
+
+                        <p className="text-gray-600 leading-relaxed">
+                          Chaque joueur possède une zone circulaire autour de lui d'un rayon de 0,5 m. Si le ballon se trouve dans cette zone, le joueur est considéré en possession de celui-ci. Si deux joueurs "possèdent" le ballon, l'algorithme classe l'événement comme un duel, en définissant une zone circulaire autour du ballon d'un rayon d'1 m. Dans ce cas, on calcule :
+                        </p>
+
+                        <ul className="list-disc pl-6 space-y-2 text-gray-600">
+                          <li>La distance entre les joueurs et le ballon,</li>
+                          <li>Le déplacement du ballon (Δs) entre deux frames (f et f+1),</li>
+                          <li>Le vecteur de direction du ballon (df₀),</li>
+                          <li>La vitesse de déplacement du ballon (vf₀)</li>
+                        </ul>
+
+                        <div className="bg-gray-50 rounded-lg p-1">
+                          <img
+                            src="/possession2.png"
+                            alt="Calculs de possession"
+                            className="w-full h-auto object-contain max-h-[300px] sm:max-h-[400px]"
+                          />
+                          <p className="text-xs sm:text-sm text-gray-500 mt-1 text-center">Calculs pour la détection de possession</p>
+                        </div>
+
+                        <p className="text-gray-600 leading-relaxed">
+                          Un joueur perd la possession lorsque le ballon quitte sa zone, que le déplacement du ballon est supérieur à un seuil défini, et que le joueur n'est plus présent par la suite (le ballon entre dans la zone d'un seul joueur, sans qu'il y ait de zone de duel).
+                        </p>
+
+                        <p className="text-gray-600 leading-relaxed">
+                          Le ballon est récupéré par un autre joueur si ce dernier est proche du ballon et entre en contact avec lui, ce qui est caractérisé par un changement de direction et de vitesse du ballon.
+                        </p>
+
+                        <p className="text-gray-600 leading-relaxed">
+                          Ce type de calcul permet d'obtenir une précision de plus de 90 %.
+                          <button 
+                            onClick={() => setSelectedReference(15)}
+                            className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
+                          >
+                            <sup>[2]</sup>
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Close Button */}
+              <div className="sm:hidden flex-shrink-0 p-4 bg-white border-t border-gray-100">
+                <button
+                  onClick={() => setSelectedStat(null)}
+                  className="w-full bg-brand-800 hover:bg-brand-700 active:bg-brand-900 text-white px-6 py-3.5 rounded-xl text-sm font-medium flex items-center gap-2 justify-center"
+                >
+                  Fermer
+                </button>
+              </div>
+
+              {/* References Modal */}
+              <AnimatePresence>
+                {selectedReference && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4"
+                    onClick={() => setSelectedReference(null)}
+                  >
+                    <motion.div
+                      className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-lg font-semibold text-brand-800">Référence [{selectedReference === 14 ? '1' : '2'}]</h3>
                         <button
                           onClick={() => setSelectedReference(null)}
                           className="p-1 hover:bg-gray-100 rounded-full"
