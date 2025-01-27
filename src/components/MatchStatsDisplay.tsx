@@ -1023,8 +1023,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                     >
                       <sup>[2]</sup>
                     </button>
-                          . Celui-ci est cependant peu applicable en temps réel puisque, comme abordé dans la partie "tracking", le modèle utilisé (ResNet50) est entraîné sur des événements déjà découpés.
-                        </p>
+                          . Celui-ci est cependant peu applicable en temps réel puisque, comme abordé dans la partie "tracking", le modèle utilisé (ResNet50) est entraîné sur des événements déjà découpés, où seule une classification parmi différents événements possibles est nécessaire.</p>
 
                         <p className="text-gray-600 leading-relaxed">
                           Après le processus de tracking détaillé dans une autre section, nous pouvons appliquer un apprentissage des séquences avec un réseau MLSTM (Multi-Layer Long Short-Term Memory). Ce réseau capture les relations temporelles entre les trames afin de détecter des motifs séquentiels associés aux événements, tels que les cartons rouges dans notre cas.
@@ -1062,7 +1061,7 @@ const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
                             </div>
                             <div className="bg-white p-3 rounded-lg text-center">
                               <div className="text-xl font-bold text-betting-win">83%</div>
-                              <div className="text-sm text-gray-500">Notre MLSTM</div>
+                              <div className="text-sm text-gray-500">ResNet50+MLSTM</div>
                             </div>
                           </div>
                         </div>
