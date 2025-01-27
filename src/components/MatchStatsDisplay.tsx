@@ -16,7 +16,10 @@ interface MatchData {
   id: string;
   homeTeam: string;
   awayTeam: string;
-  score: string;
+  score: {
+    home: number;
+    away: number;
+  };
   time: string;
   league: string;
   redCards: {
@@ -81,6 +84,31 @@ const references: Reference[] = [
     id: 8,
     text: "Reconnaissance d'événements dans le football",
     url: "https://ntnuopen.ntnu.no/ntnu-xmlui/bitstream/handle/11250/3011129/AI-Driven_Salient_Soccer_Events_Recognition_Framework_for_Next_Generation_IoT-Enabled_Environments.pdf"
+  },
+  {
+    id: 9,
+    text: "Suivi manuel des statistiques",
+    url: "https://passed.fr/passion_/donnees-statistiques-football/"
+  },
+  {
+    id: 10,
+    text: "Détection d'événements avec MLSTM",
+    url: "https://ntnuopen.ntnu.no/ntnu-xmlui/bitstream/handle/11250/3011129/AI-Driven_Salient_Soccer_Events_Recognition_Framework_for_Next_Generation_IoT-Enabled_Environments.pdf"
+  },
+  {
+    id: 11,
+    text: "Détection d'événements et classification des buts",
+    url: "https://link.springer.com/article/10.1007/s12283-022-00381-6"
+  },
+  {
+    id: 12,
+    text: "Machine Learning et capteurs pour la détection de buts",
+    url: "https://arxiv.org/pdf/2103.02938"
+  },
+  {
+    id: 13,
+    text: "Classification d'événements avec MLSTM",
+    url: "https://ntnuopen.ntnu.no/ntnu-xmlui/bitstream/handle/11250/3011129/AI-Driven_Salient_Soccer_Events_Recognition_Framework_for_Next_Generation_IoT-Enabled_Environments.pdf"
   }
 ];
 
@@ -97,80 +125,88 @@ const teamCompositions = {
   }
 };
 
-const MatchStatsDisplay: React.FC = () => {
+interface Props {
+  matchData: MatchData;
+}
+
+const MatchStatsDisplay: React.FC<Props> = ({ matchData = {
+  id: "L1-2024-OM-OL",
+  homeTeam: "OM",
+  awayTeam: "OL",
+  score: {
+    home: 3,
+    away: 2
+  },
+  time: "87'",
+  league: "Ligue 1 McDonald's",
+  redCards: {
+    home: 1,
+    away: 0,
+    homePlayers: ["Leonardo Balerdi"]
+  },
+  stats: {
+    possession: {
+      home: 65,
+      away: 35,
+      algorithm: "Calculé en temps réel basé sur le temps de contrôle effectif du ballon via computer vision et machine learning. Notre système utilise des caméras haute définition pour suivre la position du ballon et des joueurs, permettant une analyse précise de la possession.",
+      odds: { home: 1.85, draw: 3.40, away: 4.20 },
+      trend: 'up'
+    },
+    shots: {
+      home: 18,
+      away: 4,
+      algorithm: "Détection automatique des tirs via analyse vidéo et intelligence artificielle. Notre système reconnaît les mouvements caractéristiques des tirs et utilise des capteurs de vitesse pour mesurer la puissance.",
+      odds: { home: 1.95, draw: 3.50, away: 3.80 },
+      suspended: true
+    },
+    passes: {
+      home: 385,
+      away: 198,
+      algorithm: "Comptage des échanges de balle réussis entre coéquipiers grâce à notre système de tracking optique avancé. L'IA analyse les trajectoires du ballon pour identifier les passes intentionnelles.",
+      odds: { home: 1.75, draw: 3.60, away: 4.50 },
+      trend: 'stable'
+    },
+    xG: {
+      home: 5.24,
+      away: 1.12,
+      algorithm: "Expected Goals (xG) calculé en temps réel en utilisant le machine learning. Notre modèle analyse la position du tir, l'angle, la pression des défenseurs et l'historique des situations similaires.",
+      odds: { home: 1.90, draw: 3.45, away: 4.10 }
+    },
+    corners: {
+      home: 9,
+      away: 2,
+      algorithm: "Détection automatique des corners via notre système de tracking vidéo. Les caméras suivent la sortie du ballon et sa position exacte sur le terrain.",
+      odds: { home: 2.10, draw: 3.20, away: 3.60 },
+      trend: 'down'
+    },
+    fouls: {
+      home: 8,
+      away: 15,
+      algorithm: "Analyse en temps réel des contacts entre joueurs via notre système de computer vision. L'IA évalue l'intensité et la nature des contacts pour identifier les fautes.",
+      odds: { home: 2.25, draw: 3.30, away: 3.15 }
+    }
+  }
+} }) => {
   const [selectedStat, setSelectedStat] = useState<string | null>(null);
   const [showHighlightModal, setShowHighlightModal] = useState(false);
   const [selectedComposition, setSelectedComposition] = useState<'home' | 'away' | null>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [selectedReference, setSelectedReference] = useState<number | null>(null);
   const [showFixedButton, setShowFixedButton] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [showRedCardInfo, setShowRedCardInfo] = useState(false);
+  const [showGoalInfo, setShowGoalInfo] = useState(false);
   
-  const matchData: MatchData = {
-    id: "L1-2024-OM-OL",
-    homeTeam: "OM",
-    awayTeam: "OL",
-    score: "3 - 2",
-    time: "87'",
-    league: "Ligue 1 McDonald's",
-    redCards: {
-      home: 1,
-      away: 0,
-      homePlayers: ["Leonardo Balerdi"]
-    },
-    stats: {
-      possession: {
-        home: 65,
-        away: 35,
-        algorithm: "Calculé en temps réel basé sur le temps de contrôle effectif du ballon via computer vision et machine learning. Notre système utilise des caméras haute définition pour suivre la position du ballon et des joueurs, permettant une analyse précise de la possession.",
-        odds: { home: 1.85, draw: 3.40, away: 4.20 },
-        trend: 'up'
-      },
-      shots: {
-        home: 18,
-        away: 4,
-        algorithm: "Détection automatique des tirs via analyse vidéo et intelligence artificielle. Notre système reconnaît les mouvements caractéristiques des tirs et utilise des capteurs de vitesse pour mesurer la puissance.",
-        odds: { home: 1.95, draw: 3.50, away: 3.80 },
-        suspended: true
-      },
-      passes: {
-        home: 385,
-        away: 198,
-        algorithm: "Comptage des échanges de balle réussis entre coéquipiers grâce à notre système de tracking optique avancé. L'IA analyse les trajectoires du ballon pour identifier les passes intentionnelles.",
-        odds: { home: 1.75, draw: 3.60, away: 4.50 },
-        trend: 'stable'
-      },
-      xG: {
-        home: 5.24,
-        away: 1.12,
-        algorithm: "Expected Goals (xG) calculé en temps réel en utilisant le machine learning. Notre modèle analyse la position du tir, l'angle, la pression des défenseurs et l'historique des situations similaires.",
-        odds: { home: 1.90, draw: 3.45, away: 4.10 }
-      },
-      corners: {
-        home: 9,
-        away: 2,
-        algorithm: "Détection automatique des corners via notre système de tracking vidéo. Les caméras suivent la sortie du ballon et sa position exacte sur le terrain.",
-        odds: { home: 2.10, draw: 3.20, away: 3.60 },
-        trend: 'down'
-      },
-      fouls: {
-        home: 8,
-        away: 15,
-        algorithm: "Analyse en temps réel des contacts entre joueurs via notre système de computer vision. L'IA évalue l'intensité et la nature des contacts pour identifier les fautes.",
-        odds: { home: 2.25, draw: 3.30, away: 3.15 }
-      }
-    }
-  };
-
   useEffect(() => {
     // Afficher le modal initial
     setShowHighlightModal(true);
     setTimeout(() => setShowHighlightModal(false), 5000);
 
-    // Configurer l'intervalle pour les affichages suivants
+    // Configurer l'intervalle pour les affichages suivants (toutes les 5 minutes)
     const timer = setInterval(() => {
       setShowHighlightModal(true);
       setTimeout(() => setShowHighlightModal(false), 5000);
-    }, 30000);
+    }, 300000); // 5 minutes = 300000ms
 
     return () => clearInterval(timer);
   }, []);
@@ -271,24 +307,57 @@ const MatchStatsDisplay: React.FC = () => {
           {/* Header */}
           <div className="text-white p-6 pb-8">
             <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2">
-                <Trophy size={16} className="text-betting-win" />
+              <div className="flex items-center gap-3">
+                <img src="/ligue1logo.png" alt="Logo Ligue 1" className="h-6 w-auto object-contain" />
                 <span className="text-sm font-medium">{matchData.league}</span>
               </div>
-              <button className="hover:text-betting-win transition-colors" aria-label="Favori">
-                <Star size={16} />
+              <button 
+                onClick={() => setIsFavorite(!isFavorite)} 
+                className={`hover:scale-110 transition-all duration-300 ${isFavorite ? 'text-betting-win' : 'hover:text-betting-win'}`} 
+                aria-label="Favori"
+              >
+                <Star size={16} className={isFavorite ? 'fill-current' : ''} />
               </button>
             </div>
             <div className="flex justify-between items-center mb-4">
-              <div className="text-2xl font-bold">{matchData.homeTeam}</div>
-              <div className="flex flex-col items-center">
-                <div className="text-3xl font-bold tracking-tight">{matchData.score}</div>
-                <div className="text-sm text-white/80 flex items-center gap-1 mt-1">
-                  <Clock size={12} />
-                  {matchData.time}
+              <div className="flex items-center gap-4">
+                <img src="/omlogo.png" alt="Logo OM" className="w-20 h-20 object-contain" />
+                <div className="flex flex-col items-start">
+                  <div className="text-4xl font-bold h-[48px] flex items-center">{matchData.homeTeam}</div>
+                  {matchData.redCards.home > 0 && (
+                    <button 
+                      onClick={() => setShowRedCardInfo(true)}
+                      className="flex items-center gap-2 mt-1 hover:bg-white/10 px-2 py-1 rounded-lg transition-colors"
+                    >
+                      <div className="w-4 h-6 bg-red-600 rounded-sm"></div>
+                      <span className="text-sm text-white/80">Balerdi</span>
+                      <Info size={14} className="text-white/60" />
+                    </button>
+                  )}
                 </div>
               </div>
-              <div className="text-2xl font-bold">{matchData.awayTeam}</div>
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={() => setShowGoalInfo(true)}
+                  className="text-white/80 hover:text-white flex items-center gap-1 mb-2 text-sm"
+                >
+                  <Info size={14} />
+                  <span>Détection des buts</span>
+                </button>
+                <div className="text-3xl font-bold tracking-tight flex items-center gap-4">
+                  <span>{matchData.score.home}</span>
+                  <span>-</span>
+                  <span>{matchData.score.away}</span>
+                </div>
+                <div className="text-sm text-white/80 flex items-center gap-1 mt-1">
+                  <Clock size={12} />
+                  <span>{matchData.time}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-4xl font-bold h-[48px] flex items-center">{matchData.awayTeam}</div>
+                <img src="/ollogo.png" alt="Logo OL" className="w-14 h-14 object-contain" />
+              </div>
             </div>
           </div>
 
@@ -347,8 +416,16 @@ const MatchStatsDisplay: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Side - Empty space for symmetry (Desktop) */}
-        <div className="hidden lg:block w-[400px]" />
+        {/* Right Side - Ladder (Desktop) */}
+        <div className="hidden lg:block w-[400px] bg-white">
+          <div className="h-full flex items-center">
+            <img
+              src="/ladder.png"
+              alt="Ladder"
+              className="w-full h-auto max-h-[calc(100vh-2rem)] object-contain"
+            />
+          </div>
+        </div>
 
         {/* Mobile Compositions */}
         <div className="lg:hidden bg-white">
@@ -810,7 +887,7 @@ const MatchStatsDisplay: React.FC = () => {
                       onClick={e => e.stopPropagation()}
                     >
                       <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-lg font-semibold text-brand-800">Référence [{selectedReference}]</h3>
+                        <h3 className="text-lg font-semibold text-brand-800">Référence [{selectedReference === 1 ? '1' : selectedReference === 2 ? '2' : '3'}]</h3>
                         <button
                           onClick={() => setSelectedReference(null)}
                           className="p-1 hover:bg-gray-100 rounded-full"
@@ -843,24 +920,423 @@ const MatchStatsDisplay: React.FC = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed left-4 right-4 top-10 w-auto max-w-md mx-auto z-[100]"
+            className="fixed left-4 right-4 top-6 w-auto max-w-[280px] mx-auto z-[100]"
             role="alert"
             aria-live="polite"
           >
-            <div className="bg-surface-light rounded-xl shadow-lg p-4 border border-betting-win/10">
-              <div className="flex items-center gap-3">
+            <div className="bg-surface-light rounded-lg shadow-lg p-3 border border-betting-win/10">
+              <div className="flex items-center gap-2">
                 <div 
-                  className="w-10 h-10 bg-betting-win/10 rounded-full flex items-center justify-center flex-shrink-0"
+                  className="w-8 h-8 bg-betting-win/10 rounded-full flex items-center justify-center flex-shrink-0"
                   aria-hidden="true"
                 >
-                  <AlertTriangle size={20} className="text-betting-win" />
+                  <AlertTriangle size={16} className="text-betting-win" />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="font-medium text-brand-800 truncate">Rumeur Mercato !</h4>
-                  <p className="text-sm text-gray-600 line-clamp-2">Auren Bradley pourrait rejoindre l'OM en tant que gardien</p>
+                  <h4 className="font-medium text-brand-800 truncate text-sm">Rumeur Mercato !</h4>
+                  <p className="text-xs text-gray-600 line-clamp-2">Auren Bradley pourrait rejoindre l'OM en tant que gardien</p>
                 </div>
               </div>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Red Card Info Modal */}
+      <AnimatePresence>
+        {showRedCardInfo && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              className="bg-white w-full sm:rounded-2xl sm:max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
+            >
+              {/* Modal Header */}
+              <div className="bg-brand-800 text-white p-4 sm:p-6 flex-shrink-0">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-3">
+                    <div className="p-2 bg-white/10 rounded-lg">
+                      <div className="w-4 h-6 bg-red-600 rounded-sm"></div>
+                    </div>
+                    Détection des Cartons Rouges
+                  </h2>
+                  <button
+                    onClick={() => setShowRedCardInfo(false)}
+                    className="p-2 hover:bg-white/10 active:bg-white/20 rounded-full transition-colors"
+                    aria-label="Fermer"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Content - Scrollable */}
+              <div className="p-4 sm:p-8 overflow-y-auto flex-1">
+                {/* Introduction */}
+                <div className="bg-gray-50 rounded-xl p-4 sm:p-6 shadow-md mb-6">
+                  <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+                    Pour reconnaître les cartons, peu de recherches se concentrent spécifiquement sur ce sujet. Voici les différentes approches possibles pour détecter et analyser les cartons rouges lors d'un match de football.
+                  </p>
+                </div>
+
+                {/* Main Methods Section */}
+                <div className="space-y-6">
+                  {/* Manual Method */}
+                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div className="p-4 sm:p-6">
+                      <h3 className="text-lg font-semibold text-brand-800 mb-4">Méthode Manuelle</h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        La première solution, qui semble évidente, consisterait à effectuer un suivi manuel, où un technicien chargé de collecter les statistiques du match reporterait l'intégralité des données à la main
+                    <button 
+                      onClick={() => setSelectedReference(9)}
+                      className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
+                    >
+                      <sup>[1]</sup>
+                    </button>
+                  </p>
+                    </div>
+                  </div>
+
+                  {/* Automated Method */}
+                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div className="p-4 sm:p-6">
+                      <h3 className="text-lg font-semibold text-brand-800 mb-4">Méthode Automatisée</h3>
+                      <div className="space-y-4">
+                        <p className="text-gray-600 leading-relaxed">
+                          Notre objectif est de trouver un moyen d'automatiser ce type de tâche. À ce jour, un seul article traite de ce sujet
+                    <button 
+                      onClick={() => setSelectedReference(10)}
+                      className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
+                    >
+                      <sup>[2]</sup>
+                    </button>
+                          . Celui-ci est cependant peu applicable en temps réel puisque, comme abordé dans la partie "tracking", le modèle utilisé (ResNet50) est entraîné sur des événements déjà découpés.
+                        </p>
+
+                        <p className="text-gray-600 leading-relaxed">
+                          Après le processus de tracking détaillé dans une autre section, nous pouvons appliquer un apprentissage des séquences avec un réseau MLSTM (Multi-Layer Long Short-Term Memory). Ce réseau capture les relations temporelles entre les trames afin de détecter des motifs séquentiels associés aux événements, tels que les cartons rouges dans notre cas.
+                        </p>
+
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <h4 className="text-brand-800 font-semibold mb-3">Fonctionnement du MLSTM</h4>
+                          <p className="text-gray-600 mb-4">
+                            Le MLSTM prédit une classe avec un score de confiance en se basant sur :
+                          </p>
+                          <ul className="list-disc pl-6 space-y-2 text-gray-600">
+                            <li>La corrélation des mouvements des joueurs</li>
+                            <li>Les actions contextuelles (comme les fautes)</li>
+                            <li>Les indices visuels spécifiques</li>
+                  </ul>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <h4 className="text-brand-800 font-semibold mb-3">Résultats Comparatifs</h4>
+                          <p className="text-gray-600 mb-4">
+                            Ces prédictions sont comparées à l'ensemble de données SVE (Soccer Video Events) pour calculer le score d'accuracy, qui atteint 83 %. Comparaison avec d'autres techniques :
+                          </p>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-white p-3 rounded-lg text-center">
+                              <div className="text-xl font-bold text-brand-600">73%</div>
+                              <div className="text-sm text-gray-500">HOG+SVM</div>
+                            </div>
+                            <div className="bg-white p-3 rounded-lg text-center">
+                              <div className="text-xl font-bold text-brand-600">82%</div>
+                              <div className="text-sm text-gray-500">AlexNet+MLSTM</div>
+                            </div>
+                            <div className="bg-white p-3 rounded-lg text-center">
+                              <div className="text-xl font-bold text-brand-600">82%</div>
+                              <div className="text-sm text-gray-500">GoogleNet+MLSTM</div>
+                            </div>
+                            <div className="bg-white p-3 rounded-lg text-center">
+                              <div className="text-xl font-bold text-betting-win">83%</div>
+                              <div className="text-sm text-gray-500">Notre MLSTM</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-6">
+                    <div className="relative aspect-[16/9] w-full">
+                      <img
+                        src="/redcard.png"
+                        alt="Détection de carton rouge"
+                        className="w-full h-full object-contain rounded-lg shadow-md"
+                      />
+                    </div>
+                    <p className="text-sm text-gray-500 mt-2 text-center">Détection de carton rouge avec MLSTM</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Close Button */}
+              <div className="sm:hidden flex-shrink-0 p-4 bg-white border-t border-gray-100">
+                <button
+                  onClick={() => setShowRedCardInfo(false)}
+                  className="w-full bg-brand-800 hover:bg-brand-700 active:bg-brand-900 text-white px-6 py-3.5 rounded-xl text-sm font-medium flex items-center gap-2 justify-center"
+                >
+                  Fermer
+                </button>
+              </div>
+
+              {/* References Modal */}
+              <AnimatePresence>
+                {selectedReference && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4"
+                    onClick={() => setSelectedReference(null)}
+                  >
+                    <motion.div
+                      className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-lg font-semibold text-brand-800">Référence [{selectedReference === 9 ? '1' : '2'}]</h3>
+                        <button
+                          onClick={() => setSelectedReference(null)}
+                          className="p-1 hover:bg-gray-100 rounded-full"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                      <p className="text-gray-600 mb-4">{references[selectedReference - 1].text}</p>
+                      <a
+                        href={references[selectedReference - 1].url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-brand-600 hover:text-brand-700 underline break-all"
+                      >
+                        {references[selectedReference - 1].url}
+                      </a>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Goal Info Modal */}
+      <AnimatePresence>
+        {showGoalInfo && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              className="bg-white w-full sm:rounded-2xl sm:max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
+            >
+              {/* Modal Header */}
+              <div className="bg-brand-800 text-white p-4 sm:p-6 flex-shrink-0">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-3">
+                    <div className="p-2 bg-white/10 rounded-lg">
+                      <BarChart2 size={24} className="text-betting-win" />
+                    </div>
+                    Détection des Buts
+                  </h2>
+                  <button
+                    onClick={() => setShowGoalInfo(false)}
+                    className="p-2 hover:bg-white/10 active:bg-white/20 rounded-full transition-colors"
+                    aria-label="Fermer"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Content - Scrollable */}
+              <div className="p-4 sm:p-8 overflow-y-auto flex-1">
+                {/* Introduction */}
+                <div className="bg-gray-50 rounded-xl p-4 sm:p-6 shadow-md mb-6">
+                  <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+                    La statistique qui est sûrement la plus regardée par la population, même par ceux qui n'aiment pas ce sport, est bien celle-ci : le nombre de buts. Il existe en effet plusieurs moyens de la détecter.
+                  </p>
+                </div>
+
+                {/* Main Methods Section */}
+                <div className="space-y-6">
+                  {/* Event Detection Method */}
+                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div className="p-4 sm:p-6">
+                      <h3 className="text-lg font-semibold text-brand-800 mb-4">Détection d'événements et classification</h3>
+                      <div className="space-y-2">
+                        <p className="text-gray-600 leading-relaxed">
+                          La première méthode fonctionne avec des arbres de décision. Après avoir effectué le suivi des joueurs, on applique nos méthodes présentées dans la partie "possessions" afin de connaître l'équipe titulaire du ballon (qui sera l'équipe qui marque).
+                        </p>
+
+                        <div className="bg-gray-50 rounded-lg p-1">
+                          <img
+                            src="/goal1.png"
+                            alt="Classification des événements"
+                            className="w-full h-auto object-contain max-h-[300px] sm:max-h-[400px]"
+                          />
+                          <p className="text-xs sm:text-sm text-gray-500 mt-1 text-center">Méthodologie de classification des événements</p>
+                        </div>
+
+                        <p className="text-gray-600 leading-relaxed">
+                          Si tous les joueurs sont dans leur moitié de terrain et qu'au moins un joueur est dans le cercle central, nous pouvons classer cet événement comme un but pour l'équipe qui avait la possession.
+                        </p>
+
+                        <div className="bg-gray-50 rounded-lg p-1">
+                          <img
+                            src="/goal2.png"
+                            alt="Position des joueurs après un but"
+                            className="w-full h-auto object-contain max-h-[300px] sm:max-h-[400px]"
+                          />
+                          <p className="text-xs sm:text-sm text-gray-500 mt-1 text-center">Position des joueurs après un but</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sensors Method */}
+                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div className="p-4 sm:p-6">
+                      <h3 className="text-lg font-semibold text-brand-800 mb-4">Capteurs</h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        Si l'on utilise des capteurs sur des joueurs, il est conseillé d'utiliser du Machine Learning, tel qu'un RandomForestClassifier, qui s'entraînerait sur nos données collectées dans le but de prédire des buts
+                        <button 
+                          onClick={() => setSelectedReference(12)}
+                          className="inline-flex items-center text-brand-600 hover:text-brand-700 ml-1"
+                        >
+                          <sup>[2]</sup>
+                        </button>
+                      </p>
+
+                      <div className="bg-gray-50 rounded-xl p-4 mt-4">
+                        <h4 className="text-brand-800 font-semibold mb-3">Techniques utilisées</h4>
+                        <ul className="list-disc pl-6 space-y-2 text-gray-600">
+                          <li>Frequent Itemset Mining (FIM)</li>
+                          <li>Algorithme Apriori</li>
+                          <li>Analyse des séquences d'annotations</li>
+                          <li>Règles d'association</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Event Classification Method */}
+                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div className="p-4 sm:p-6">
+                      <h3 className="text-lg font-semibold text-brand-800 mb-4">Classification d'événements</h3>
+                      <div className="space-y-4">
+                        <p className="text-gray-600 leading-relaxed">
+                          Dans la même idée que pour les cartons rouges, il est possible de faire de la classification d'événements, où l'on appliquerait un réseau MLSTM (Multi-Layer Long Short-Term Memory), capturant les relations temporelles entre les trames afin de détecter des motifs séquentiels associés aux événements, tels que les buts.
+                        </p>
+
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <h4 className="text-brand-800 font-semibold mb-3">Paramètres analysés</h4>
+                          <ul className="list-disc pl-6 space-y-2 text-gray-600">
+                            <li>Corrélation des mouvements des joueurs</li>
+                            <li>Actions contextuelles</li>
+                            <li>Indices visuels spécifiques</li>
+                          </ul>
+                        </div>
+
+                        <div className="mt-4 bg-gray-50 rounded-xl p-4">
+                          <div className="relative aspect-[16/9] w-full">
+                            <img
+                              src="/goal3.png"
+                              alt="Classification MLSTM"
+                              className="w-full h-full object-contain rounded-lg shadow-md"
+                            />
+                          </div>
+                          <p className="text-sm text-gray-500 mt-2 text-center">Classification des buts avec MLSTM</p>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <h4 className="text-brand-800 font-semibold mb-3">Résultats par type de but</h4>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-white p-3 rounded-lg text-center">
+                              <div className="text-xl font-bold text-brand-600">89%</div>
+                              <div className="text-sm text-gray-500">But normal</div>
+                            </div>
+                            <div className="bg-white p-3 rounded-lg text-center">
+                              <div className="text-xl font-bold text-brand-600">88%</div>
+                              <div className="text-sm text-gray-500">But de la tête</div>
+                            </div>
+                            <div className="bg-white p-3 rounded-lg text-center">
+                              <div className="text-xl font-bold text-betting-win">98%</div>
+                              <div className="text-sm text-gray-500">But sur penalty</div>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => setSelectedReference(13)}
+                            className="inline-flex items-center text-brand-600 hover:text-brand-700 mt-3"
+                          >
+                            <sup>[3]</sup>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Close Button */}
+              <div className="sm:hidden flex-shrink-0 p-4 bg-white border-t border-gray-100">
+                <button
+                  onClick={() => setShowGoalInfo(false)}
+                  className="w-full bg-brand-800 hover:bg-brand-700 active:bg-brand-900 text-white px-6 py-3.5 rounded-xl text-sm font-medium flex items-center gap-2 justify-center"
+                >
+                  Fermer
+                </button>
+              </div>
+
+              {/* References Modal */}
+              <AnimatePresence>
+                {selectedReference && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4"
+                    onClick={() => setSelectedReference(null)}
+                  >
+                    <motion.div
+                      className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-lg font-semibold text-brand-800">Référence [{selectedReference === 11 ? '1' : selectedReference === 12 ? '2' : '3'}]</h3>
+                        <button
+                          onClick={() => setSelectedReference(null)}
+                          className="p-1 hover:bg-gray-100 rounded-full"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                      <p className="text-gray-600 mb-4">{references[selectedReference - 1].text}</p>
+                      <a
+                        href={references[selectedReference - 1].url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-brand-600 hover:text-brand-700 underline break-all"
+                      >
+                        {references[selectedReference - 1].url}
+                      </a>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
